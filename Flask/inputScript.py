@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import whois
 import datetime
-
+import os
 
 def url_having_ip(url):
 #using regular function
