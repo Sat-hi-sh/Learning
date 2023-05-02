@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Breast Cancer Detection</title>
+  </head>
+  <body>
+    <h1>Breast Cancer Detection</h1>
+    <form action="/" method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Upload">
+    </form>
+    {% if filename %}
+      <h2>Input Image</h2>
+      <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Input Image">
+      {% if output %}
+        <h2>Output</h2>
+        <pre>{{ output }}</pre>
+
+        <h2>Apply Gaussian blur</h2>
+        <img src="{{ url_for('static', filename='results/result1.png') }}" alt="Gaussian Blur">
+
+        <h2>Define the binary mask </h2>
+        <img src="{{ url_for('static', filename='results/result2.png') }}" alt="Masked Image">
+
+        <h2>Normalize the grayscale image</h2>
+        <img src="{{ url_for('static', filename='results/result3.png') }}" alt="Gray Scale Image">
+
+        <h2>Apply the blue-red colormap</h2>
+        <img src="{{ url_for('static', filename='results/result4.png') }}" alt="Blue-Red Image">
+
+        <h2>Threshold the image to get a binary image</h2>
+        <img src="{{ url_for('static', filename='results/result5.png') }}" alt="Threshold Image">
+        
+        <h2>Output Image</h2>
+        <img src="{{ url_for('static', filename='results/result.png') }}" alt="Output Image">
+
+      {% endif %}
+    {% endif %}
+  </body>
+</html>
