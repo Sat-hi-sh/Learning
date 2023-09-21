@@ -19,6 +19,8 @@ else{
 int lar = 0;
 lar =  lar > (a>b?a:b)?lar:(a>b?a:b);
 
+int largestofThree=(a>b) ? ((a>c) ? a:c) : (b>c) ? (b:c);
+	
 System.out.println(lar);
 
 }
