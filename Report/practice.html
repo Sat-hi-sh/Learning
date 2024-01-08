@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Line Hits Moving Rectangle</title>
+</head>
+<body>
+  <canvas id="myCanvas" width="600" height="300" style="border:1px solid;"></canvas>
+  <script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+    var rect = { x: 0, y: 0, width: 600, height: 300 };
+    var movingRect = { x: 560, y: 100, width: 40, height: 100 };
+    var hitCount = 0;
+    var notHitCount = 0;
+
+    function bounceMovingRect() {
+      var direction = 1; // 1 for downward, -1 for upward
+      function moveRect() {
+        movingRect.y += direction * 5;
+        if (movingRect.y <= 0 || movingRect.y + movingRect.height >= rect.height) {
+          direction *= -1; // Reverse direction on reaching top or bottom
+        }
+        draw();
+        requestAnimationFrame(moveRect);
+      }
+      moveRect();
+    }
+
+    bounceMovingRect(); // Start the bouncing animation
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the big rectangle
+      ctx.beginPath();
+      ctx.rect(rect.x, rect.y, rect.width, rect.height);
+      ctx.strokeStyle = "black";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Draw the moving rectangle
+      ctx.beginPath();
+      ctx.rect(movingRect.x, movingRect.y, movingRect.width, movingRect.height);
+      ctx.fillStyle = "lightblue";
+      ctx.strokeStyle = "black";
+      ctx.stroke();
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function createAndMoveLine(event) {
+      var mouseX = event.clientX;
+      var mouseY = event.clientY;
+
+      var currentX = mouseX;
+
+      function drawLine() {
+        ctx.beginPath();
+        ctx.moveTo(mouseX, mouseY);
+        ctx.lineTo(currentX, mouseY);
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+        ctx.closePath();
+      }
+
+      drawLine();
+
+      function animateLine() {
+        currentX += 5;
+        draw();
+
+        var movingRectLeft = movingRect.x;
+        var movingRectRight = movingRectLeft + movingRect.width;
+        var movingRectTop = movingRect.y;
+        var movingRectBottom = movingRectTop + movingRect.height;
+
+        drawLine();
+
+        if (
+          currentX >= movingRectLeft &&
+          currentX <= movingRectRight &&
+          mouseY >= movingRectTop &&
+          mouseY <= movingRectBottom
+        ) {
+          hitCount++;
+          document.getElementById("hitCount").textContent = "Hit: " + hitCount;
+        } else if (currentX >= rect.width) {
+          notHitCount++;
+          document.getElementById("notHitCount").textContent = "Not Hit: " + notHitCount;
+        } else {
+          requestAnimationFrame(animateLine);
+        }
+      }
+
+      animateLine();
+    }
+
+    canvas.addEventListener("click", createAndMoveLine);
+
+    // Initial draw
+    draw();
+  </script>
+  <div id="hitCount">Hit: 0</div>
+  <div id="notHitCount">Not Hit: 0</div>
+</body>
+</html>
