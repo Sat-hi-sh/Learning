@@ -1,109 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvas Line Hits Moving Rectangle</title>
+
+<style>
+
+</style>
+
 </head>
-<body>
-  <canvas id="myCanvas" width="600" height="300" style="border:1px solid;"></canvas>
-  <script>
-    var canvas = document.getElementById("myCanvas");
-    var ctx = canvas.getContext("2d");
 
-    var rect = { x: 0, y: 0, width: 600, height: 300 };
-    var movingRect = { x: 560, y: 100, width: 40, height: 100 };
-    var hitCount = 0;
-    var notHitCount = 0;
+<body width="1260">
 
-    function bounceMovingRect() {
-      var direction = 1; // 1 for downward, -1 for upward
-      function moveRect() {
-        movingRect.y += direction * 5;
-        if (movingRect.y <= 0 || movingRect.y + movingRect.height >= rect.height) {
-          direction *= -1; // Reverse direction on reaching top or bottom
-        }
-        draw();
-        requestAnimationFrame(moveRect);
-      }
-      moveRect();
+<canvas id="flagCanvas" width="1260" height="709"></canvas>
+
+<script>
+
+const canvas = document.getElementById("flagCanvas");
+const ctx = canvas.getContext("2d");
+
+ctx.lineWidth = 4;
+
+const circle = {
+  x: 750,
+  y: 350,
+  radius: 40,
+  color: "white"
+};
+
+function drawCircle() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = circle.color;
+  ctx.stroke();
+  ctx.fill();
+}
+
+var id = null;
+var id1 = null;
+
+function CircleBouncing() {
+  clearInterval(id);
+  clearInterval(id1);
+
+  let angle = Math.random() * Math.PI;
+
+  if (Math.abs(angle - Math.PI / 2) < 0.001) {
+    angle = Math.PI / 2;
+  }
+
+  let rd = Math.random() * 180;
+
+  let updatedCY = circle.y - 40; // Move up one step
+
+  let UpdatedCX = circle.x + rd * Math.cos(angle);
+
+  // Edge case for width
+  if (UpdatedCX < 40) {
+    UpdatedCX = 50;
+  } else if (UpdatedCX > 1280) {
+    UpdatedCX = 1280;
+  }
+
+  circle.x = UpdatedCX;
+
+  id = setInterval(Move, 2);
+
+  function Move() {
+    if (circle.y >= updatedCY) {
+      clearInterval(id);
+      id1 = setInterval(DownFall, 50);
+    } else {
+      clearInterval(id1);
     }
 
-    bounceMovingRect(); // Start the bouncing animation
+    circle.y -= 1;
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw the big rectangle
-      ctx.beginPath();
-      ctx.rect(rect.x, rect.y, rect.width, rect.height);
-      ctx.strokeStyle = "black";
-      ctx.stroke();
-      ctx.closePath();
-
-      // Draw the moving rectangle
-      ctx.beginPath();
-      ctx.rect(movingRect.x, movingRect.y, movingRect.width, movingRect.height);
-      ctx.fillStyle = "lightblue";
-      ctx.strokeStyle = "black";
-      ctx.stroke();
-      ctx.fill();
-      ctx.closePath();
+    // Edge cases for height
+    if (circle.y < 0) {
+      circle.y = 50;
+    } else if (circle.y > 709) {
+      circle.y = 709;
     }
 
-    function createAndMoveLine(event) {
-      var mouseX = event.clientX;
-      var mouseY = event.clientY;
+    drawCircle();
+  }
 
-      var currentX = mouseX;
-
-      function drawLine() {
-        ctx.beginPath();
-        ctx.moveTo(mouseX, mouseY);
-        ctx.lineTo(currentX, mouseY);
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-        ctx.closePath();
-      }
-
-      drawLine();
-
-      function animateLine() {
-        currentX += 5;
-        draw();
-
-        var movingRectLeft = movingRect.x;
-        var movingRectRight = movingRectLeft + movingRect.width;
-        var movingRectTop = movingRect.y;
-        var movingRectBottom = movingRectTop + movingRect.height;
-
-        drawLine();
-
-        if (
-          currentX >= movingRectLeft &&
-          currentX <= movingRectRight &&
-          mouseY >= movingRectTop &&
-          mouseY <= movingRectBottom
-        ) {
-          hitCount++;
-          document.getElementById("hitCount").textContent = "Hit: " + hitCount;
-        } else if (currentX >= rect.width) {
-          notHitCount++;
-          document.getElementById("notHitCount").textContent = "Not Hit: " + notHitCount;
-        } else {
-          requestAnimationFrame(animateLine);
-        }
-      }
-
-      animateLine();
+  function DownFall() {
+    if (circle.y <= canvas.height - 40) {
+      circle.y++;
+      drawCircle();
+    } else {
+      clearInterval(id1);
     }
+  }
+}
 
-    canvas.addEventListener("click", createAndMoveLine);
+canvas.addEventListener("click", CircleBouncing);
 
-    // Initial draw
-    draw();
-  </script>
-  <div id="hitCount">Hit: 0</div>
-  <div id="notHitCount">Not Hit: 0</div>
+drawCircle(); // Initial drawing
+
+</script>
+
 </body>
 </html>
