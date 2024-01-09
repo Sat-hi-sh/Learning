@@ -1,106 +1,100 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<style>
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar Chart</title>
 </head>
-
-<body width="1260">
-
-<canvas id="flagCanvas" width="1260" height="709"></canvas>
+<body>
 
 <script>
+  // Get the number of values from the user
+  const numValues = parseInt(prompt("Enter the number of values:"));
 
-const canvas = document.getElementById("flagCanvas");
-const ctx = canvas.getContext("2d");
+  // Arrays to store x and y values
+  const xValues = [];
+  const yValues = [];
 
-ctx.lineWidth = 4;
-
-const circle = {
-  x: 750,
-  y: 350,
-  radius: 40,
-  color: "white"
-};
-
-function drawCircle() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.beginPath();
-  ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = "black";
-  ctx.fillStyle = circle.color;
-  ctx.stroke();
-  ctx.fill();
-}
-
-var id = null;
-var id1 = null;
-
-function CircleBouncing() {
-  clearInterval(id);
-  clearInterval(id1);
-
-  let angle = Math.random() * Math.PI;
-
-  if (Math.abs(angle - Math.PI / 2) < 0.001) {
-    angle = Math.PI / 2;
+  // Get the x and y values
+  for (let i = 0; i < numValues; i++) {
+    xValues.push(parseFloat(prompt(`Enter x value ${i + 1}:`)));
+    yValues.push(parseFloat(prompt(`Enter y value ${i + 1}:`)));
   }
 
-  let rd = Math.random() * 180;
+  // Get the intervals for x and y
+  const xInterval = parseFloat(prompt("Enter interval for x:"));
+  const yInterval = parseFloat(prompt("Enter interval for y:"));
 
-  let updatedCY = circle.y - 40; // Move up one step
+  // Create SVG element and plot the values
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  document.body.appendChild(svg);
 
-  let UpdatedCX = circle.x + rd * Math.cos(angle);
-
-  // Edge case for width
-  if (UpdatedCX < 40) {
-    UpdatedCX = 50;
-  } else if (UpdatedCX > 1280) {
-    UpdatedCX = 1280;
+  // Plot the bars with the y attribute adjusted for upward direction
+  for (let i = 0; i < numValues; i++) {
+    const rect = document.createElementNS(svgNS, "rect");
+    rect.setAttribute("x", i * xInterval);
+    rect.setAttribute("y", svg.clientHeight - yValues[i] * yInterval);
+    rect.setAttribute("width", xInterval);
+    rect.setAttribute("height", yValues[i] * yInterval);
+    svg.appendChild(rect);
   }
 
-  circle.x = UpdatedCX;
+  // Add x-axis line
+  const xAxis = document.createElementNS(svgNS, "line");
+  xAxis.setAttribute("x1", 0);
+  xAxis.setAttribute("y1", svg.clientHeight);
+  xAxis.setAttribute("x2", svg.clientWidth);
+  xAxis.setAttribute("y2", svg.clientHeight);
+  xAxis.setAttribute("stroke", "black");
+  svg.appendChild(xAxis);
 
-  id = setInterval(Move, 2);
+  // Add y-axis line
+  const yAxis = document.createElementNS(svgNS, "line");
+  yAxis.setAttribute("x1", 0);
+  yAxis.setAttribute("y1", 0);
+  yAxis.setAttribute("x2", 0);
+  yAxis.setAttribute("y2", svg.clientHeight);
+  yAxis.setAttribute("stroke", "black");
+  svg.appendChild(yAxis);
 
-  function Move() {
-    if (circle.y >= updatedCY) {
-      clearInterval(id);
-      id1 = setInterval(DownFall, 50);
-    } else {
-      clearInterval(id1);
-    }
-
-    circle.y -= 1;
-
-    // Edge cases for height
-    if (circle.y < 0) {
-      circle.y = 50;
-    } else if (circle.y > 709) {
-      circle.y = 709;
-    }
-
-    drawCircle();
+  // Add x-axis labels
+  for (let i = 0; i < numValues; i++) {
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("x", i * xInterval + xInterval / 2);
+    text.setAttribute("y", svg.clientHeight + 15);
+    text.setAttribute("text-anchor", "middle");
+    text.textContent = xValues[i];
+    svg.appendChild(text);
   }
 
-  function DownFall() {
-    if (circle.y <= canvas.height - 40) {
-      circle.y++;
-      drawCircle();
-    } else {
-      clearInterval(id1);
-    }
+  // Add y-axis labels
+  for (let i = 0; i <= numValues; i++) {
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("x", -10);
+    text.setAttribute("y", svg.clientHeight - i * yInterval);
+    text.setAttribute("text-anchor", "end");
+    text.textContent = i * yInterval;
+    svg.appendChild(text);
   }
-}
 
-canvas.addEventListener("click", CircleBouncing);
+  // Display x and y interval values separately
+  const xIntervalDiv = document.createElement("div");
+  xIntervalDiv.textContent = `X Interval: ${xInterval}`;
+  document.body.appendChild(xIntervalDiv);
 
-drawCircle(); // Initial drawing
+  const yIntervalDiv = document.createElement("div");
+  yIntervalDiv.textContent = `Y Interval: ${yInterval}`;
+  document.body.appendChild(yIntervalDiv);
 
+  // Display x and y axis values
+  const xAxisValuesDiv = document.createElement("div");
+  xAxisValuesDiv.textContent = `X Axis Values: ${xValues.join(', ')}`;
+  document.body.appendChild(xAxisValuesDiv);
+
+  const yAxisValuesDiv = document.createElement("div");
+  yAxisValuesDiv.textContent = `Y Axis Values: ${yValues.join(', ')}`;
+  document.body.appendChild(yAxisValuesDiv);
 </script>
 
 </body>
