@@ -1,116 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bar Chart</title>
-  <style>
-    .chart-container {
-      width: 400px;
-      height: 320px; /* Increased height to accommodate X-axis labels */
-      border: 1px solid #ccc;
-      overflow: hidden;
+
+<style type="text/css">
+  #dvcontainer {
+    height: 600px;
+    width: 900px;
+    position: absolute;
+  }
+
+  #svgcontainer {
+    display: block;
+    margin: auto;
+  }
+</style>
+
+<script type="text/javascript">
+  var populationArray = [];
+  var svg;
+  var svgcwidth, svgcHeight, svgcMargin, svgcSpace;
+  var svgcMarginSpace, svgcMarginHeight;
+  var bcwidth, bcMargin, totalChartBars, maximumDataValue, maximumDataValuex;
+  var totalLabelOnYAxis, totalLabelOnXAxis;
+  var xAxisInterval, yAxisInterval;
+
+  function drawBarChart() {
+    getUserInput();
+    svg = document.getElementById('svgcontainer');
+    clearGraph();
+    svgcMargin = 20;
+    svgcSpace = 60;
+    svgcHeight = svg.height.baseVal.value - 2 * svgcMargin - svgcSpace;
+    svgcwidth = svg.width.baseVal.value - 2 * svgcMargin - svgcSpace;
+    svgcMarginSpace = svgcMargin + svgcSpace;
+    svgcMarginHeight = svgcMargin + svgcHeight;
+    bcMargin = 0;
+    totalChartBars = populationArray.length;
+    bcwidth = 20;
+    maximumDataValue = 0;
+    maximumDataValuex = 0;
+
+    for (var i = 0; i < totalChartBars; i++) {
+      var arrVal = populationArray[i].split(",");
+      var barVal = parseInt(arrVal[1]);
+      if (barVal > maximumDataValue)
+        maximumDataValue = barVal;
+
+      var barValx = parseInt(arrVal[0]);
+      if (barValx > maximumDataValuex)
+        maximumDataValuex = barValx;
     }
 
-    .bar {
-      stroke: #4CAF50; /* Set the border color */
-      fill: none; /* Remove the fill color */
+    totalLabelOnYAxis = Math.ceil(maximumDataValue / yAxisInterval);
+    totalLabelOnXAxis = Math.ceil(maximumDataValuex / xAxisInterval);
+
+    drawAxisLabelAndMarkers();
+    drawChartWithCalculation("Bar");
+  }
+
+  function getUserInput() {
+    var arraysize = prompt("Enter the size of the array:");
+
+    for (var i = 0; i < arraysize; i++) {
+      var x = prompt("Enter x coordinate for entry " + (i + 1) + ":");
+      var y = prompt("Enter y coordinate for entry " + (i + 1) + ":");
+      populationArray.push(x + "," + y);
     }
 
-    .axis-text {
-      font-size: 12px;
+    xAxisInterval = prompt("Enter X-axis interval:");
+    yAxisInterval = prompt("Enter Y-axis interval:");
+  }
+
+  function clearGraph() {
+    while (svg.lastChild) {
+      svg.removeChild(svg.lastChild);
     }
-  </style>
-</head>
-<body>
-
-<div class="chart-container">
-  <svg id="barChart"></svg>
-</div>
-
-<div id="axisValues">
-  <p id="xAxisLabel"></p>
-  <p id="yAxisLabel"></p>
-  <p id="xAxisInterval"></p>
-  <p id="yAxisInterval"></p>
-</div>
-
-<script>
-  // Data for the bar chart
-  const data = [2, 4, 6, 8, 10];
-
-  // Default axis values and intervals
-  let xAxisValues = [5, 10, 15, 20, 25];
-  let yAxisValues = [2, 4, 6, 8, 10];
-  let xAxisInterval = 80;
-  let yAxisInterval = 2; // Default Y-Axis interval
-
-  // Get user input for X-Axis Values
-  const userInputX = prompt("Enter X-Axis Values separated by commas (e.g., 5, 10, 15, 20, 25):");
-  if (userInputX) {
-    xAxisValues = userInputX.split(',').map(Number);
   }
 
-  // Get user input for Y-Axis Values
-  const userInputY = prompt("Enter Y-Axis Values separated by commas (e.g., 2, 4, 6, 8, 10):");
-  if (userInputY) {
-    yAxisValues = userInputY.split(',').map(Number);
+  function drawXYAxis(x1, y1, x2, y2) {
+    var dataAxis = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    dataAxis.setAttribute("x1", x1);
+    dataAxis.setAttribute("y1", y1);
+    dataAxis.setAttribute("x2", x2);
+    dataAxis.setAttribute("y2", y2);
+    dataAxis.style.stroke = "black";
+    dataAxis.style.strokeWidth = "5px";
+    svg.appendChild(dataAxis);
   }
 
-  // Get user input for X-Axis Interval
-  const userInputIntervalX = prompt("Enter X-Axis Interval:");
-  if (userInputIntervalX) {
-    xAxisInterval = parseInt(userInputIntervalX, 10);
+  function drawAxisMarkers() {
+    for (var i = 0; i < totalLabelOnYAxis + 1; i++) {
+      markerVal = i * yAxisInterval;
+      markerValHt = i * yAxisInterval * svgcHeight / maximumDataValue;
+      var xMarkers = svgcMarginSpace - 5;
+      var yMarkers = svgcMarginHeight - markerValHt;
+      textelement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      textelement.setAttribute('dx', xMarkers - 40);
+      textelement.setAttribute('dy', yMarkers);
+      txtnode = document.createTextNode(markerVal);
+      textelement.appendChild(txtnode);
+      svg.appendChild(textelement);
+    }
+
+    for (var i = 0; i < totalLabelOnXAxis + 1; i++) {
+      markerValX = i * xAxisInterval;
+      markerXPosition = svgcMarginSpace + i * (bcwidth + bcMargin) - 5;
+      markerYPosition = svgcMarginHeight + 40;
+      textelement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      textelement.setAttribute('dx', markerXPosition);
+      textelement.setAttribute('dy', markerYPosition);
+      txtnode = document.createTextNode(markerValX);
+      textelement.appendChild(txtnode);
+      svg.appendChild(textelement);
+    }
   }
 
-  // Get user input for Y-Axis Interval
-  const userInputIntervalY = prompt("Enter Y-Axis Interval:");
-  if (userInputIntervalY) {
-    yAxisInterval = parseInt(userInputIntervalY, 10);
+  function drawAxisLabelAndMarkers() {
+    drawXYAxis(svgcMarginSpace, svgcMarginHeight, svgcMarginSpace, svgcMargin);
+    drawXYAxis(svgcMarginSpace, svgcMarginHeight, (svgcMarginSpace + 100) + (bcwidth + bcMargin) * totalChartBars, svgcMarginHeight);
+    drawAxisMarkers();
   }
 
-  // Set up the SVG container
-  const svg = document.getElementById("barChart");
-  svg.setAttribute("width", 400);
-  svg.setAttribute("height", 320);
-
-  // Create bars
-  data.forEach((value, index) => {
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("class", "bar");
-    rect.setAttribute("x", index * xAxisInterval + 20);
-    rect.setAttribute("y", 300 - value * 20);
-    rect.setAttribute("width", 60);
-    rect.setAttribute("height", value * 20);
+  function drawRectangleForChart(x, y, wd, ht, fill) {
+    var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    rect.setAttributeNS(null, 'x', x);
+    rect.setAttributeNS(null, 'y', y);
+    rect.setAttributeNS(null, 'width', bcwidth - 5);
+    rect.setAttributeNS(null, 'height', ht);
+    rect.setAttributeNS(null, 'stroke', "green");
+    rect.setAttributeNS(null, 'stroke-width', "4");
+    rect.setAttributeNS(null, 'fill', "white");
     svg.appendChild(rect);
-  });
+  }
 
-  // Create X-axis labels
-  xAxisValues.forEach((value, index) => {
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("class", "axis-text");
-    text.setAttribute("x", index * xAxisInterval + 50);
-    text.setAttribute("y", 315); // Adjusted Y position to make X-axis labels visible
-    text.textContent = value;
-    svg.appendChild(text);
-  });
+  function drawChartWithCalculation(chart) {
+    for (var i = 0; i < totalChartBars; i++) {
+      var arrchartVal = populationArray[i].split(",");
+      bcVal = parseInt(arrchartVal[1]);
+      bcHt = (bcVal * svgcHeight / maximumDataValue);
+      bcX = svgcMarginSpace + (arrchartVal[0] / xAxisInterval) * (bcwidth + bcMargin);
+      bcY = svgcMarginHeight - bcHt - 2;
+      switch (chart) {
+        case "Bar":
+          drawRectangleForChart(bcX, bcY, bcwidth, bcHt, true);
+          break;
+      }
+    }
+  }
 
-  // Create Y-axis labels
-  yAxisValues.forEach((value, index) => {
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("class", "axis-text");
-    text.setAttribute("x", 10);
-    text.setAttribute("y", 300 - index * 60);
-    text.textContent = value;
-    svg.appendChild(text);
-  });
-
-  // Update axis values in the HTML
-  document.getElementById("xAxisLabel").textContent = "X-Axis Values: " + xAxisValues.join(", ");
-  document.getElementById("yAxisLabel").textContent = "Y-Axis Values: " + yAxisValues.join(", ");
-  document.getElementById("xAxisInterval").textContent = "X-Axis Interval: " + xAxisInterval;
-  document.getElementById("yAxisInterval").textContent = "Y-Axis Interval: " + yAxisInterval;
+  window.onload = drawBarChart;
 </script>
 
+</head>
+
+<body>
+
+  <div id="dvcontainer">
+    <svg id="svgcontainer" height="400" width="600"></svg>
+  </div>
+
 </body>
+
 </html>
