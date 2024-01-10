@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar Chart</title>
+  <style>
+    .chart-container {
+      width: 400px;
+      height: 320px; /* Increased height to accommodate X-axis labels */
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+
+    .bar {
+      stroke: #4CAF50; /* Set the border color */
+      fill: none; /* Remove the fill color */
+    }
+
+    .axis-text {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chart-container">
+  <svg id="barChart"></svg>
+</div>
+
+<div id="axisValues">
+  <p id="xAxisLabel"></p>
+  <p id="yAxisLabel"></p>
+  <p id="xAxisInterval"></p>
+  <p id="yAxisInterval"></p>
+</div>
+
+<script>
+  // Data for the bar chart
+  const data = [2, 4, 6, 8, 10];
+
+  // Default axis values and intervals
+  let xAxisValues = [5, 10, 15, 20, 25];
+  let yAxisValues = [2, 4, 6, 8, 10];
+  let xAxisInterval = 80;
+  let yAxisInterval = 2; // Default Y-Axis interval
+
+  // Get user input for X-Axis Values
+  const userInputX = prompt("Enter X-Axis Values separated by commas (e.g., 5, 10, 15, 20, 25):");
+  if (userInputX) {
+    xAxisValues = userInputX.split(',').map(Number);
+  }
+
+  // Get user input for Y-Axis Values
+  const userInputY = prompt("Enter Y-Axis Values separated by commas (e.g., 2, 4, 6, 8, 10):");
+  if (userInputY) {
+    yAxisValues = userInputY.split(',').map(Number);
+  }
+
+  // Get user input for X-Axis Interval
+  const userInputIntervalX = prompt("Enter X-Axis Interval:");
+  if (userInputIntervalX) {
+    xAxisInterval = parseInt(userInputIntervalX, 10);
+  }
+
+  // Get user input for Y-Axis Interval
+  const userInputIntervalY = prompt("Enter Y-Axis Interval:");
+  if (userInputIntervalY) {
+    yAxisInterval = parseInt(userInputIntervalY, 10);
+  }
+
+  // Set up the SVG container
+  const svg = document.getElementById("barChart");
+  svg.setAttribute("width", 400);
+  svg.setAttribute("height", 320);
+
+  // Create bars
+  data.forEach((value, index) => {
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("class", "bar");
+    rect.setAttribute("x", index * xAxisInterval + 20);
+    rect.setAttribute("y", 300 - value * 20);
+    rect.setAttribute("width", 60);
+    rect.setAttribute("height", value * 20);
+    svg.appendChild(rect);
+  });
+
+  // Create X-axis labels
+  xAxisValues.forEach((value, index) => {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("class", "axis-text");
+    text.setAttribute("x", index * xAxisInterval + 50);
+    text.setAttribute("y", 315); // Adjusted Y position to make X-axis labels visible
+    text.textContent = value;
+    svg.appendChild(text);
+  });
+
+  // Create Y-axis labels
+  yAxisValues.forEach((value, index) => {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("class", "axis-text");
+    text.setAttribute("x", 10);
+    text.setAttribute("y", 300 - index * 60);
+    text.textContent = value;
+    svg.appendChild(text);
+  });
+
+  // Update axis values in the HTML
+  document.getElementById("xAxisLabel").textContent = "X-Axis Values: " + xAxisValues.join(", ");
+  document.getElementById("yAxisLabel").textContent = "Y-Axis Values: " + yAxisValues.join(", ");
+  document.getElementById("xAxisInterval").textContent = "X-Axis Interval: " + xAxisInterval;
+  document.getElementById("yAxisInterval").textContent = "Y-Axis Interval: " + yAxisInterval;
+</script>
+
+</body>
+</html>
