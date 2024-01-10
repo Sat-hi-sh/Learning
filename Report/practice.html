@@ -32,16 +32,15 @@
   <p id="xAxisLabel"></p>
   <p id="yAxisLabel"></p>
   <p id="xAxisInterval"></p>
+  <p id="yAxisInterval"></p>
 </div>
 
 <script>
-  // Data for the bar chart
-  const data = [2, 4, 6, 8, 10];
-
-  // Default axis values and interval
+  // Default axis values and intervals
   let xAxisValues = [5, 10, 15, 20, 25];
   let yAxisValues = [2, 4, 6, 8, 10];
   let xAxisInterval = 80;
+  let yAxisInterval = 2; // Default Y-Axis interval
 
   // Get user input for X-Axis Values
   const userInputX = prompt("Enter X-Axis Values separated by commas (e.g., 5, 10, 15, 20, 25):");
@@ -56,9 +55,15 @@
   }
 
   // Get user input for X-Axis Interval
-  const userInputInterval = prompt("Enter X-Axis Interval:");
-  if (userInputInterval) {
-    xAxisInterval = parseInt(userInputInterval, 10);
+  const userInputIntervalX = prompt("Enter X-Axis Interval:");
+  if (userInputIntervalX) {
+    xAxisInterval = parseInt(userInputIntervalX, 10);
+  }
+
+  // Get user input for Y-Axis Interval
+  const userInputIntervalY = prompt("Enter Y-Axis Interval:");
+  if (userInputIntervalY) {
+    yAxisInterval = parseInt(userInputIntervalY, 10);
   }
 
   // Set up the SVG container
@@ -67,13 +72,13 @@
   svg.setAttribute("height", 320);
 
   // Create bars
-  data.forEach((value, index) => {
+  xAxisValues.forEach((value, index) => {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("class", "bar");
     rect.setAttribute("x", index * xAxisInterval + 20);
-    rect.setAttribute("y", 300 - value * 20);
+    rect.setAttribute("y", 300 - yAxisValues[index] * 20);
     rect.setAttribute("width", 60);
-    rect.setAttribute("height", value * 20);
+    rect.setAttribute("height", yAxisValues[index] * 20);
     svg.appendChild(rect);
   });
 
@@ -101,6 +106,7 @@
   document.getElementById("xAxisLabel").textContent = "X-Axis Values: " + xAxisValues.join(", ");
   document.getElementById("yAxisLabel").textContent = "Y-Axis Values: " + yAxisValues.join(", ");
   document.getElementById("xAxisInterval").textContent = "X-Axis Interval: " + xAxisInterval;
+  document.getElementById("yAxisInterval").textContent = "Y-Axis Interval: " + yAxisInterval;
 </script>
 
 </body>
