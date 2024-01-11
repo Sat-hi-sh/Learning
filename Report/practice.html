@@ -3,102 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG Bar Chart</title>
+    <title>Bar Chart</title>
     <style>
-        text {
-            font-family: Arial, sans-serif;
+        #chart {
+            position: relative;
+            border: 1px solid #ccc;
+            width: 400px;
+            height: 300px;
+        }
+
+        .bar {
+            position: absolute;
+            background-color: steelblue;
+        }
+
+        .label {
+            position: absolute;
             font-size: 12px;
+            color: black;
+            text-align: center;
+        }
+
+        .x-interval-label {
+            position: absolute;
+            font-size: 12px;
+            color: black;
+            text-align: center;
+            bottom: -15px;
+        }
+
+        .y-interval-label {
+            position: absolute;
+            font-size: 12px;
+            color: black;
+            text-align: center;
+            right: -25px;
+        }
+
+        #output {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <h2>Bar Chart</h2>
+    
+    <button onclick="plotBars()">Plot Bars</button>
 
-<script>
-    // Function to create the SVG bar chart
-    function createBarChart() {
-        // Get user inputs
-        var numRectangles = parseInt(prompt("Enter the number of rectangles:"));
-        var xInterval = parseInt(prompt("Enter the X interval:"));
-        var yInterval = parseInt(prompt("Enter the Y interval:"));
+    <div id="chart"></div>
 
-        // Create SVG container
-        var svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svgContainer.setAttribute("width", (numRectangles * xInterval) + 200);
-        svgContainer.setAttribute("height", "500");
+    <div id="output"></div>
 
-        // Create X-axis
-        var xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        xAxis.setAttribute("x1", "50");
-        xAxis.setAttribute("y1", "480");
-        xAxis.setAttribute("x2", (numRectangles * xInterval) + 150);
-        xAxis.setAttribute("y2", "480");
-        xAxis.setAttribute("stroke", "black");
-        svgContainer.appendChild(xAxis);
+    <script>
+        function plotBars() {
+            const arraySize = parseInt(prompt('Enter Array Size:'));
+            const xValues = prompt('Enter X Values (comma-separated, 1-10):').split(',').map(Number);
+            const yValues = prompt('Enter Y Values (comma-separated, 1-10):').split(',').map(Number);
+            const xInterval = parseInt(prompt('Enter X Interval (1-10):'));
+            const yInterval = parseInt(prompt('Enter Y Interval (1-10):'));
+            const defaultGap = 10;
 
-        // Label X-axis intervals
-        for (var i = 0; i <= numRectangles; i++) {
-            var xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            xLabel.setAttribute("x", 50 + i * xInterval);
-            xLabel.setAttribute("y", "495");
-            xLabel.setAttribute("text-anchor", "middle");
-            xLabel.setAttribute("fill", "black");
-            xLabel.textContent = i * xInterval;
-            svgContainer.appendChild(xLabel);
+            const chartDiv = document.getElementById('chart');
+            const outputDiv = document.getElementById('output');
+            chartDiv.innerHTML = '';
+            outputDiv.innerHTML = '';
+
+            for (let i = 0; i < arraySize; i++) {
+                const x = xValues[i];
+                const y = yValues[i];
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.width = xInterval + 'px';
+                bar.style.height = y * 10 + 'px'; // Scaling y values for better visibility
+                bar.style.left = i * (xInterval + defaultGap) + 'px';
+                bar.style.bottom = '0';
+
+                const label = document.createElement('div');
+                label.className = 'label';
+                label.innerText = y;
+                label.style.width = xInterval + 'px';
+                label.style.left = i * (xInterval + defaultGap) + 'px';
+                label.style.bottom = y * 10 + 'px'; // Align label with the top of the bar
+
+                const xIntervalLabel = document.createElement('div');
+                xIntervalLabel.className = 'x-interval-label';
+                xIntervalLabel.innerText = x;
+                xIntervalLabel.style.left = i * (xInterval + defaultGap) + 'px';
+
+                const yIntervalLabel = document.createElement('div');
+                yIntervalLabel.className = 'y-interval-label';
+                yIntervalLabel.innerText = y;
+                yIntervalLabel.style.bottom = y * 10 + 'px';
+
+                chartDiv.appendChild(bar);
+                chartDiv.appendChild(label);
+                chartDiv.appendChild(xIntervalLabel);
+                chartDiv.appendChild(yIntervalLabel);
+            }
+
+            // Output x, y values, and x, y intervals
+            outputDiv.innerHTML = `<p>X Values: ${xValues.join(', ')}</p>`;
+            outputDiv.innerHTML += `<p>Y Values: ${yValues.join(', ')}</p>`;
+            outputDiv.innerHTML += `<p>X Interval: ${xInterval}</p>`;
+            outputDiv.innerHTML += `<p>Y Interval: ${yInterval}</p>`;
         }
-
-        // Create Y-axis
-        var yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        yAxis.setAttribute("x1", "50");
-        yAxis.setAttribute("y1", "20");
-        yAxis.setAttribute("x2", "50");
-        yAxis.setAttribute("y2", "480");
-        yAxis.setAttribute("stroke", "black");
-        svgContainer.appendChild(yAxis);
-
-        // Label Y-axis intervals
-        for (var j = 0; j <= 10; j++) {
-            var yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            yLabel.setAttribute("x", "40");
-            yLabel.setAttribute("y", 480 - j * (yInterval * 10));
-            yLabel.setAttribute("text-anchor", "end");
-            yLabel.setAttribute("fill", "black");
-            yLabel.textContent = j * yInterval;
-            svgContainer.appendChild(yLabel);
-        }
-
-        // Get X-axis values
-        var xValues = prompt("Enter X-axis values (comma-separated):").split(',');
-
-        // Get Y-axis values
-        var yValues = prompt("Enter Y-axis values (comma-separated):").split(',');
-
-        // Draw rectangles
-        for (var k = 0; k < numRectangles; k++) {
-            var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("x", 50 + k * xInterval);
-            rect.setAttribute("y", 480 - yValues[k] * yInterval);
-            rect.setAttribute("width", xInterval - 5);
-            rect.setAttribute("height", yValues[k] * yInterval);
-            rect.setAttribute("fill", "blue");
-            svgContainer.appendChild(rect);
-
-            // Display values on top of each bar
-            var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("x", 50 + k * xInterval + xInterval / 2);
-            text.setAttribute("y", 480 - yValues[k] * yInterval - 5);
-            text.setAttribute("text-anchor", "middle");
-            text.setAttribute("fill", "black");
-            text.textContent = yValues[k];
-            svgContainer.appendChild(text);
-        }
-
-        // Display the SVG container on the page
-        document.body.appendChild(svgContainer);
-    }
-
-    // Call the function to create the bar chart
-    createBarChart();
-</script>
-
+    </script>
 </body>
 </html>
